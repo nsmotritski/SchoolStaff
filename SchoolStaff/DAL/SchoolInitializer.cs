@@ -11,7 +11,7 @@ namespace SchoolStaff.DAL
     {
         protected override void Seed(SchoolContext context)
         {
-            var students = new List<Individual>
+            var individuals = new List<Individual>
             {
             new Individual{FirstName="Carson",MiddleName="Paul",LastName="Alexander",DateOfBirth=DateTime.Parse("1995-09-01"),Email="test1@test.com",ContactPhone="8(029)1234567"},
             new Individual{FirstName="Meredith",MiddleName="Paul",LastName="Alonso",DateOfBirth=DateTime.Parse("1992-09-01"),Email="test1@test.com",ContactPhone="8(029)2345678"},
@@ -23,7 +23,7 @@ namespace SchoolStaff.DAL
             new Individual{FirstName="Nino",MiddleName="Paul",LastName="Olivetto",DateOfBirth=DateTime.Parse("1995-09-01"),Email="test1@test.com",ContactPhone="8(029)1134567"}
             };
 
-            students.ForEach(s => context.Individuals.Add(s));
+            individuals.ForEach(s => context.Individuals.Add(s));
             context.SaveChanges();
         }
     }
