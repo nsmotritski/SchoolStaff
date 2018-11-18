@@ -12,5 +12,6 @@ namespace ContosoUniversity.Models
         public DateTime DateOfBirth { get; set; }
         public string Email { get; set; }
         public string ContactPhone { get; set; }
+        public string Secret { get; set; }
     }
 }

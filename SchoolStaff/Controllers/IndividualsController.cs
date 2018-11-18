@@ -1,5 +1,6 @@
 ﻿using ContosoUniversity.Models;
 using SchoolStaff.DAL;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -42,29 +43,50 @@ namespace SchoolStaff.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,FirstName,MiddleName,LastName,DateOfBirth,Email,ContactPhone")] Individual individual)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Individuals.Add(individual);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Individuals.Add(individual);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (DataException /* dex */)
+            {
+                //Log the error (uncomment dex variable name and add a line here to write a log.
+                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
             }
 
             return View(individual);
         }
 
         // GET: Individuals/Edit/5
-        public ActionResult Edit(int? id)
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditPost(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Individual individual = db.Individuals.Find(id);
-            if (individual == null)
+            var individualToUpdate = db.Individuals.Find(id);
+            if (TryUpdateModel(individualToUpdate, "",
+               new string[] { "FirstName, MiddleName, LastName, DateOfBirth, Email, ContactPhone" }))
             {
-                return HttpNotFound();
+                try
+                {
+                    db.SaveChanges();
+
+                    return RedirectToAction("Index");
+                }
+                catch (DataException /* dex */)
+                {
+                    //Log the error (uncomment dex variable name and add a line here to write a log.
+                    ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
+                }
             }
-            return View(individual);
+            return View(individualToUpdate);
         }
 
         // POST: Individuals/Edit/5
@@ -84,11 +106,15 @@ namespace SchoolStaff.Controllers
         }
 
         // GET: Individuals/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewBag.ErrorMessage = "Delete failed. Try again, and if the problem persists see your system administrator";
             }
             Individual individual = db.Individuals.Find(id);
             if (individual == null)
@@ -98,14 +124,21 @@ namespace SchoolStaff.Controllers
             return View(individual);
         }
 
-        // POST: Individuals/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Delete(int id)
         {
-            Individual individual = db.Individuals.Find(id);
-            db.Individuals.Remove(individual);
-            db.SaveChanges();
+            try
+            {
+                Individual individual = db.Individuals.Find(id);
+                db.Individuals.Remove(individual);
+                db.SaveChanges();
+            }
+            catch (DataException/* dex */)
+            {
+                //Log the error (uncomment dex variable name and add a line here to write a log.
+                return RedirectToAction("Delete", new { id, saveChangesError = true });
+            }
             return RedirectToAction("Index");
         }
 
