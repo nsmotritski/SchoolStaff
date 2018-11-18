@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ContosoUniversity.Models.Individual>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "List Of Individuals";
 }
 
 <h2>Index</h2>
@@ -12,52 +12,53 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.ActionLink("First Name", "Index", new { sortOrder = ViewBag.FirstNameSortParam })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.MiddleName)
+            @Html.ActionLink("Middle Name", "Index", new { sortOrder = ViewBag.MiddleNameSortParam })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.LastName)
+            @Html.ActionLink("Last Name", "Index", new { sortOrder = ViewBag.LastNameSortParam })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DateOfBirth)
+            @Html.ActionLink("Date Of Birth", "Index", new { sortOrder = ViewBag.DateSortParam })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParam })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ContactPhone)
+            @Html.ActionLink("Contact Phone", "Index", new { sortOrder = ViewBag.PhoneSortParam })
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MiddleName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateOfBirth)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ContactPhone)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MiddleName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfBirth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ContactPhone)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
 
 </table>

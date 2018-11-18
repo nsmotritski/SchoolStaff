@@ -1,5 +1,6 @@
 ﻿using ContosoUniversity.Models;
 using SchoolStaff.DAL;
+using System;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -13,7 +14,42 @@ namespace SchoolStaff.Controllers
         private SchoolContext db = new SchoolContext();
 
         // GET: Individuals
-        public ActionResult Index() => View(db.Individuals.ToList());
+        public ActionResult Index(string sortOrder)
+        {
+            ViewBag.FirstNameSortParam = string.IsNullOrEmpty(sortOrder) ? "firstName_desc" : "";
+            ViewBag.MiddleNameSortParam = string.IsNullOrEmpty(sortOrder) ? "middleName_desc" : "";
+            ViewBag.LastNameSortParam = string.IsNullOrEmpty(sortOrder) ? "lastName_desc" : "";
+            ViewBag.DateOfBirthSortParam = sortOrder == "Date" ? "dateOfBirth_desc" : "Date";
+            ViewBag.EmailSortParam = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
+            ViewBag.PhoneSortParam = string.IsNullOrEmpty(sortOrder) ? "phone_desc" : "";
+            var individuals = from s in db.Individuals
+                           select s;
+            switch (sortOrder)
+            {
+                case "firstName_desc":
+                    individuals = individuals.OrderByDescending(s => s.FirstName);
+                    break;
+                case "middleName_desc":
+                    individuals = individuals.OrderByDescending(s => s.MiddleName);
+                    break;
+                case "lastName_desc":
+                    individuals = individuals.OrderByDescending(s => s.LastName);
+                    break;
+                case "dateOfBirth_desc":
+                    individuals = individuals.OrderByDescending(s => s.DateOfBirth);
+                    break;
+                case "Email":
+                    individuals = individuals.OrderBy(s => s.Email);
+                    break;
+                case "contactPhone_desc":
+                    individuals = individuals.OrderByDescending(s => s.ContactPhone);
+                    break;
+                default:
+                    individuals = individuals.OrderBy(s => s.LastName);
+                    break;
+            }
+            return View(individuals.ToList());
+        }
 
         // GET: Individuals/Details/5
         public ActionResult Details(int? id)
