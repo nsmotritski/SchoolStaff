@@ -6,12 +6,25 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using Ninject;
 
 namespace SchoolStaff.Controllers
 {
     public class IndividualsController : Controller
     {
-        private SchoolContext db = new SchoolContext();
+        private IRepository repo;
+
+        public IndividualsController()
+        {
+            IKernel ninjectKernel = new StandardKernel();
+            ninjectKernel.Bind<IRepository>().To<SchoolRepository>();
+            repo = ninjectKernel.Get<IRepository>();
+        }
+
+        public IndividualsController(IRepository r)
+        {
+            repo = r;
+        }
 
         // GET: Individuals
         public ActionResult Index(string sortOrder)
@@ -22,7 +35,7 @@ namespace SchoolStaff.Controllers
             ViewBag.DateOfBirthSortParam = sortOrder == "Date" ? "dateOfBirth_desc" : "Date";
             ViewBag.EmailSortParam = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
             ViewBag.PhoneSortParam = string.IsNullOrEmpty(sortOrder) ? "phone_desc" : "";
-            var individuals = from s in db.Individuals
+            var individuals = from s in repo.List()
                            select s;
             switch (sortOrder)
             {
@@ -58,7 +71,7 @@ namespace SchoolStaff.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Individual individual = db.Individuals.Find(id);
+            Individual individual = repo.Get(id);
             if (individual == null)
             {
                 return HttpNotFound();
@@ -83,8 +96,7 @@ namespace SchoolStaff.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    db.Individuals.Add(individual);
-                    db.SaveChanges();
+                    repo.Save(individual);
                     return RedirectToAction("Index");
                 }
             }
@@ -106,13 +118,13 @@ namespace SchoolStaff.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var individualToUpdate = db.Individuals.Find(id);
+            var individualToUpdate = repo.Get(id);
             if (TryUpdateModel(individualToUpdate, "",
                new string[] { "FirstName, MiddleName, LastName, DateOfBirth, Email, ContactPhone" }))
             {
                 try
                 {
-                    db.SaveChanges();
+                    repo.SaveChanges();
 
                     return RedirectToAction("Index");
                 }
@@ -134,8 +146,8 @@ namespace SchoolStaff.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(individual).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.Get(individual.ID).State = EntityState.Modified;
+                repo.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(individual);
@@ -152,7 +164,7 @@ namespace SchoolStaff.Controllers
             {
                 ViewBag.ErrorMessage = "Delete failed. Try again, and if the problem persists see your system administrator";
             }
-            Individual individual = db.Individuals.Find(id);
+            Individual individual = repo.Get(id);
             if (individual == null)
             {
                 return HttpNotFound();
@@ -166,9 +178,8 @@ namespace SchoolStaff.Controllers
         {
             try
             {
-                Individual individual = db.Individuals.Find(id);
-                db.Individuals.Remove(individual);
-                db.SaveChanges();
+                Individual individual = repo.Get(id);
+                repo.Delete(individual);
             }
             catch (DataException/* dex */)
             {
@@ -182,7 +193,7 @@ namespace SchoolStaff.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repo.Dispose();
             }
             base.Dispose(disposing);
         }

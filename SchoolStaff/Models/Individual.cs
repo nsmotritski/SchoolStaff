@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 
 namespace ContosoUniversity.Models
 {
@@ -13,5 +14,6 @@ namespace ContosoUniversity.Models
         public string Email { get; set; }
         public string ContactPhone { get; set; }
         public string Secret { get; set; }
+        public EntityState State { get; set; }
     }
 }
