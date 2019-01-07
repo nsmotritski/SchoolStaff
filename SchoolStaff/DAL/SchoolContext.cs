@@ -83,10 +83,10 @@ namespace SchoolStaff.DAL
             _db.SaveChanges();
         }
 
-        //public void Update(Individual individual)
-        //{
-        //    db.Individuals.AddOrUpdate(individual);
-        //    db.SaveChanges();
-        //}
+        public void Update(Individual individual)
+        {
+            _db.Individuals.AddOrUpdate(individual);
+            _db.SaveChanges();
+        }
     }
 }
